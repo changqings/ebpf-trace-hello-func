@@ -27,9 +27,45 @@ RUST_LOG=info cargo xtask run
 
 ## 补充
 
-在 user space 代码中`print-hello/src/main.rs`中
+### go 代码
+
+go.mod
 
 ```
+module hello
+
+go 1.22
+```
+
+main.go
+
+```
+package main
+
+import (
+        "fmt"
+        "time"
+)
+
+
+func hello(n int) {
+        fmt.Println("hello",n)
+}
+
+func main() {
+        fmt.Println("main start")
+
+        for i := range 1000 {
+                hello(i)
+                time.Sleep(time.Second * 1)
+        }
+}
+```
+
+### program 参数
+
+```
+#在 user space 代码中`print-hello/src/main.rs`中
     program.attach(
         Some("main.hello"),
         0,
@@ -38,11 +74,22 @@ RUST_LOG=info cargo xtask run
     )?;
 ```
 
-参数解释：
-fn_name: Option<&str> //uprobe 要推测的程序内的函数名，使用 readelf -s <elf 可执行程序>来获取函数名，go build 默认编译时，对函数名进行了优化，比如 runtime.main.func2.即不是代码是的函数名，所以要查出来 elf 中正确的函数名，这里可以使用 go build 时使用构建参数来实现，其它程序请自行百度
+### 参数解释：
 
-offset: u64 //目标的偏移量，这里我使用了 0，应该还有其它用法，待查
+`fn_name`: `Option<&str>`
 
-target: T // 二进制可执行文件 or 库名的绝对路径
+- uprobe 要检测的程序内的函数名，使用 readelf -s <elf 可执行程序>来获取函数名
+- go build 默认编译时，对函数名进行了优化，比如 runtime.main.func2.即不是代码是的函数名，所以要查出来 elf 中正确的函数名
+- 这里可以使用 go build 时使用构建参数来实现，其它程序请自行百度
 
-pid: Option<pid_t> // 可选使用 pid 来识别目标，这里可以限制 target，即不但要满足 target，还是满足此 pid，才会进行连接
+`offset`: `u64`
+
+- 目标的偏移量，这里我使用了 0，应该还有其它用法，待查
+
+`target`: `T`
+
+- 二进制可执行文件 or 库名的绝对路径
+
+`pid`: `Option<pid_t>`
+
+- 可选使用 pid 来识别目标，这里可以限制 target，即不但要满足 target，还是满足此 pid，才会进行连接
