@@ -1,0 +1,2 @@
+[workspace]
+members = ["xtask", "print-hello", "print-hello-common"]
