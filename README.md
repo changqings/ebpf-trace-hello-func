@@ -62,7 +62,7 @@ func main() {
 }
 ```
 
-### program 参数
+### program.attach() 参数
 
 ```
 #在 user space 代码中`print-hello/src/main.rs`中
